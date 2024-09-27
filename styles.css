@@ -1,0 +1,108 @@
+.position-relative {
+    position: relative;
+}
+
+.text-overlay {
+    position: absolute;
+    top: 50%;  /* Vertically centers the text */
+    left: 10%; /* Puts the text towards the left side */
+    transform: translateY(-50%);  /* Centers vertically without affecting the horizontal position */
+    color: white;
+    text-align: left;  /* Aligns text to the left */
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);  /* Text shadow for better readability */
+    max-width: 600px;  /* Limit the width of text */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 1225px) {
+    .text-overlay {
+        font-size: 1.5rem;  /* Smaller font size on tablet */
+        left: 5%;  /* Adjust padding for smaller screen */
+        top: 40%;  /* Adjust vertical position */
+    }
+
+    .text-overlay h1 {
+        font-size: 2rem;  /* Reduce h1 size for tablet screens */
+    }
+}
+
+@media (max-width: 823px) {
+    .text-overlay {
+        font-size: 1.2rem;  /* Even smaller font size for mobile */
+        left: 5%;  /* Adjust padding for mobile screens */
+        top: 30%;  /* Adjust vertical position for mobile */
+    }
+
+    .text-overlay h1 {
+        font-size: 1.5rem;  /* Reduce h1 size for tablet screens */
+    }
+}
+
+@media (max-width: 643px) {
+    .text-overlay {
+        font-size: 0.8rem;  /* Even smaller font size for mobile */
+        left: 5%;  /* Adjust padding for mobile screens */
+        top: 30%;  /* Adjust vertical position for mobile */
+    }
+
+    .text-overlay h1 {
+        font-size: 1.2rem;  /* Reduce h1 size for tablet screens */
+    }
+}
+
+@media (max-width: 412px) {
+    .text-overlay {
+        font-size: 0.6rem;  /* Even smaller font size for mobile */
+        left: 5%;  /* Adjust padding for mobile screens */
+        top: 30%;  /* Adjust vertical position for mobile */
+    }
+
+    .text-overlay h1 {
+        font-size: 1.0rem;  /* Reduce h1 size for tablet screens */
+    }
+}
+
+/* Container for the list */
+.horizontal-scroll {
+    display: flex;
+    overflow-x: scroll; /* Change from auto to scroll for consistent scrollbar */
+    white-space: nowrap;
+    padding: 10px;
+  }
+
+  /* Styling for list items */
+  .horizontal-scroll li {
+    display: inline-block;
+    margin-right: 20px;
+    list-style: none;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 300px;
+    text-align: center;
+  }
+
+  /* Images inside list items */
+  .horizontal-scroll li img {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    margin-top: 10px;
+    border-radius: 8px;
+  }
+
+  /* Show scrollbar */
+  .horizontal-scroll::-webkit-scrollbar {
+    height: 14px;
+  }
+
+  .horizontal-scroll::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+  }
+
+  .horizontal-scroll::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+  }
