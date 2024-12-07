@@ -4,18 +4,34 @@ include 'koneksi.php';
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $nama = $_POST['nama'];
-  $email = $_POST['email'];
+  $whatsapp = $_POST['whatsapp'];
   $tanggal = $_POST['tanggal'];
   $waktu = $_POST['waktu'];
   $jumlah_orang = $_POST['jumlah_orang'];
   $cabang = $_POST['cabang'];
 
-  // Insert data into database
-  $query = "INSERT INTO users (nama, email, tanggal, waktu, jumlah_orang, cabang) VALUES ('$nama', '$email', '$tanggal', '$waktu', '$jumlah_orang', '$cabang')";
+  // Pastikan nomor WhatsApp diawali dengan "62" (jika dimulai dengan 0, ubah jadi 62)
+  if (substr($whatsapp, 0, 1) === '0') {
+    $whatsapp = '62' . substr($whatsapp, 1);
+  }
+
+  // Query untuk tabel utama
+  $query = "INSERT INTO reservasi (nama, whatsapp, tanggal, waktu, jumlah_orang, cabang) VALUES ('$nama', '$whatsapp', '$tanggal', '$waktu', '$jumlah_orang', '$cabang')";
   if (mysqli_query($conn, $query)) {
-      echo "Data berhasil disimpan!";
+      // Ambil ID yang baru saja di-generate
+      $last_id = mysqli_insert_id($conn);
+
+      echo "Data berhasil disimpan ke tabel reservasi dengan ID: $last_id!";
+      
+      // Query untuk tabel sementara dengan ID yang sama
+      $query_temp = "INSERT INTO reservasi_temp (id, nama, whatsapp, tanggal, waktu, jumlah_orang, cabang) VALUES ('$last_id', '$nama', '$whatsapp', '$tanggal', '$waktu', '$jumlah_orang', '$cabang')";
+      if (mysqli_query($conn, $query_temp)) {
+          echo "Data berhasil disimpan ke tabel reservasi_temp dengan ID yang sama!";
+      } else {
+          echo "Error saat menyimpan ke tabel reservasi_temp: " . mysqli_error($conn);
+      }
   } else {
-      echo "Error: " . mysqli_error($conn);
+      echo "Error saat menyimpan ke tabel reservasi: " . mysqli_error($conn);
   }
   
 }
@@ -40,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="text-overlay">
                     <h1>Ayam Penyet Ju-Pe</h1>
                     <p>Jujur Pedasnya, Jujur Puasnya!</p>
-                    <a href="?page=reservasi" class="btn btn-primary btn-lg">Reservasi Sekarang</a>
+                    <a href="#reservasi" class="btn btn-primary btn-lg">Reservasi Sekarang</a>
                 </div>
             </div>
         </div>
@@ -48,13 +64,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     <main class="container my-5">
-        <section class="hero text-center mb-5">
+        <section class="hero text-center mb-5 section" id="menu">
             <h2>Selamat Datang di Ayam Penyet Ju-Pe</h2>
             <p class="lead">Restoran modern dengan menu spesial Ayam Penyet yang menggugah selera.</p>
         </section>
 
         <section class="container mt-5">
-        <div class="horizontal-scroll">
+        <div class="horizontal-scroll" >
             <ul>
                 <!-- Menu Items -->
                 <li>
@@ -156,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </section>
 
         <section class="container my-5">
-    <h2 class="text-center mb-4">Cabang Restoran Ayam Penyet Ju-Pe</h2>
+    <h2 class="text-center mb-4 section" id="outlets">Cabang Restoran Ayam Penyet Ju-Pe</h2>
     <div class="row justify-content-center">
       <!-- Cabang 1 -->
       <div class="col-md-4">
@@ -196,7 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </section>
     </main>
 
-    <section class="container my-5 p-3 bg-warning col-md-6" style="border-radius: 50px;">
+    <section class="container my-5 p-3 bg-warning col-md-6 section" id="reservasi" style="border-radius: 50px;">
     <h2 class="text-center mb-4 ">Reservasi Online Ayam Penyet Ju-Pe</h2>
     <div class="row justify-content-center">
       <div class="col-md-9">
@@ -206,8 +222,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama Anda" required>
           </div>
           <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email Anda" required>
+              <label for="whatsapp">No. WhatsApp</label>
+              <div class="input-group">
+                  <div class="input-group-prepend">
+                      <span class="input-group-text">+</span>
+                  </div>
+                  <input type="text" class="form-control" id="whatsapp" name="whatsapp" placeholder="Masukkan nomor WhatsApp Anda" required pattern="\d+" oninput="formatWhatsappNumber()">
+              </div>
           </div>
           <div class="form-group">
             <label for="tanggal">Tanggal Reservasi</label>
@@ -226,8 +247,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="cabang">Pilih Cabang Restoran</label>
             <select class="form-control" id="cabang" name="cabang" required>
               <option value="" disabled selected>Pilih cabang</option>
-              <option value="cabang1">Cabang 1 - Sawah Baru</option>
-              <option value="cabang2">Cabang 2 - Graha Raya</option>
+              <option value="Sawah Baru">Cabang 1 - Sawah Baru</option>
+              <option value="Graha Raya">Cabang 2 - Graha Raya</option>
             </select>
           </div>
           <button type="submit" class="btn btn-primary btn-block">Kirim Reservasi</button>
@@ -237,6 +258,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </section>
 
     <?php include 'footer.php'?>    
+    <script>
+        function formatWhatsappNumber() {
+            var input = document.getElementById('whatsapp');
+            var value = input.value;
+
+            // Cek jika input dimulai dengan angka 0
+            if (value.charAt(0) === '0') {
+                value = '62' + value.substring(1); // Mengganti 0 dengan 62
+            }
+
+            // Update nilai input (hanya angka yang diizinkan)
+            input.value = value.replace(/[^0-9]/g, ''); // Menghapus karakter selain angka
+        }
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>

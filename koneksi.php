@@ -10,6 +10,6 @@ if ($conn->connect_error) {
     die('Koneksi Database gagal :' . $conn->connect_error);
 }
 else{
-    echo'gacor';
+    // echo 'Koneksi Database berhasil';
 }
 ?>
